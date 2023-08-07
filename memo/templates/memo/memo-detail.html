@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block cont %}
+
 <h2> Memo {{ memo.id }} detail:</h2>
 <table>
     <tr>
@@ -6,12 +10,19 @@
         <th>Content</th>
         <th>Category</th>
         <th>Importance</th>
+        <th>Created</th>
+        <th>Last edited</th>
     </tr>
     <tr>
         <td>{{ memo.id }}</td>
         <td>{{ memo.title }}</td>
-        <td>{{ memo.content }}</td>
-        <td>{{ memo.importance }}</td>
+        <td>{{ memo.body }}</td>
         <td>{{ memo.category }}</td>
+        <td>{{ memo.importance }}</td>
+        <td>{{ memo.created|date:'r' }}</td>
+        <td>{{ memo.edited_last|date:'r' }}</td>
     </tr>
 </table>
+
+
+{% endblock %}

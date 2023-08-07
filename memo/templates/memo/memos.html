@@ -1,5 +1,31 @@
 {% extends 'base.html' %}
 
 {% block cont %}
-<h1>Memos page</h1>
+
+<h1>Memo list page</h1>
+<p><a href="{% url 'memo-create' %}">Create new Memo</a></p>
+
+<table>
+    <tr>
+        <th>Memo #</th>
+        <th>Title </th>
+        <th>Created </th>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for memo in memo_list %}
+    <tr>
+        <td><a href="{% url 'memo-detail' memo.id %}"># {{ memo.id }}</a></td>
+        <td>{{ memo.title }}</td>
+        <td>{{ memo.created }}</td>
+        <td><a href="{% url 'memo-update' memo.id %}">Edit</a></td>
+        <td><a href="{% url 'memo-delete' memo.id %}">Delete</a></td>
+    </tr>
+    {% empty %}
+    <h1>Empty list </h1>
+    {% endfor %}
+</table>
+<br>
+
+
 {% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block cont %}
+<a href="{% url 'memo-list'%}">Cancel and return to list</a>
+<form method="POST" action="">
+    {% csrf_token %}
+    <p>Delete this memo?</p>
+    <p>{{ memo }}</p>
+    <input type="submit" value="Delete">
+</form>
+
+{% endblock %}
