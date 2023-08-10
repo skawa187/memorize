@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import MemoList, MemoDetail, MemoCreate, MemoUpdate, MemoDelete
+from django.contrib.auth.views import LogoutView
+from .views import MemoList, MemoDetail, MemoCreate, MemoUpdate, MemoDelete, UserLoginView, SignupView
 
 urlpatterns = [
+    path('login/', UserLoginView.as_view(), name = 'login'),
+    path('logout/', LogoutView.as_view(next_page='login'), name = 'logout'),
+    path('signup/', SignupView.as_view(), name = 'signup'),
     path('', MemoList.as_view(), name = 'memo-list'),
     path('memo/<int:pk>/', MemoDetail.as_view(), name = 'memo-detail'),
     path('memo-create/', MemoCreate.as_view(), name = 'memo-create'),
