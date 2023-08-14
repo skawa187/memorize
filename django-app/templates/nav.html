@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom border-body sticky-top"> 
+    <div class="container-fluid">
+        <a href="#" class="navbar-brand"><i class="bi bi-card-list"></i> Memorize</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb2 mb-lg-0">
+                <span class="navbar-text text-light-emphasis fw-semibold">Hello, {{ request.user }}</span>
+                <li class="nav-item ms-3">
+                    <a href="/" class="nav-link active">
+                        <span class="">HOME</span>
+                    </a>
+                </li>
+                {% if request.user.is_authenticated %}
+                <li class="nav-item ms-3">
+                    <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item ms-3">
+                    <span>
+                        <a href="{% url 'login' %}" class="nav-link">Login</a>
+                    </span>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

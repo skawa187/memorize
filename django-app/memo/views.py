@@ -12,6 +12,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth import login
 from .models import Memo
 
+from .tasks import test_task
+
 class SignupView(FormView):
     form_class = UserCreationForm
     template_name = 'memo/signup.html'
@@ -69,3 +71,7 @@ class MemoDelete(LoginRequiredMixin, DeleteView):
     template_name = 'memo/memo-delete.html'
     context_object_name = 'memo'
     success_url = reverse_lazy('memo-list')
+
+def test(request, i):
+    task = test_task.delay(i)
+    return render(request, 'memo/test.html', {'task':task})
