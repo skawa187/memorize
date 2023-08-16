@@ -20,7 +20,7 @@ def populate_categories(apps, schema_editor, data=categories):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('memo', '0002_category_alter_memo_category'),
+        ('memo', '0001_initial'),
     ]
 
     operations = [

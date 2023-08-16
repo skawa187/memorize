@@ -7,3 +7,4 @@ __pycache__/
 *$py.class
 /django_sec_dev.json
 /db_sec_dev.json
+media/

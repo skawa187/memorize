@@ -1,5 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+import uuid
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    uuid = models.UUIDField(default=uuid.uuid4, null=False, unique=True)
 
 class Category(models.Model):
     name=models.CharField(max_length=20, null=False, blank=False)
@@ -9,7 +14,7 @@ class Category(models.Model):
         return self.name
 
 class Memo(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=100)
     body = models.TextField(null=True, blank=True)
     importance = models.PositiveIntegerField(blank = True, default=0)

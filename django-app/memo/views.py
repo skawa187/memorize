@@ -1,21 +1,19 @@
 from typing import Any, Dict
-from django.shortcuts import render
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.forms import UserCreationForm
 
 from django.urls import reverse_lazy
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from .models import Memo
-
-from .tasks import test_task
+from .forms import CustomRegisterForm
 
 class SignupView(FormView):
-    form_class = UserCreationForm
+    form_class = CustomRegisterForm
+    User = get_user_model()
     template_name = 'memo/signup.html'
     redirect_authenticated_user = True
     success_url = reverse_lazy('login')
@@ -72,6 +70,3 @@ class MemoDelete(LoginRequiredMixin, DeleteView):
     context_object_name = 'memo'
     success_url = reverse_lazy('memo-list')
 
-def test(request, i):
-    task = test_task.delay(i)
-    return render(request, 'memo/test.html', {'task':task})

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block cont %}
+
+<h2>File list</h2>
+{{ file_list }}
+
+<p>base url</p>
+{{ base_url }}
+
+<p>user uuid</p>
+{{ request.user.name }}
+{{ request.user.uuid|slice:":8" }}
+
+<a href="{% url 'file-gen' %}">Generate new csv file</a>
+
+{% endblock %}
