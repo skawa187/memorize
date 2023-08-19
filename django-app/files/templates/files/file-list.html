@@ -2,6 +2,16 @@
 
 {% block cont %}
 
+{% if messages %}
+<ul class="messages">
+    {% for m in messages %}
+    <li {% if m.tags %} class="{{ m.tags }}"{% endif %}>
+        {{ m }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <h2>File list</h2>
 {{ file_list }}
 
