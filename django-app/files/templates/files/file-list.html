@@ -2,26 +2,44 @@
 
 {% block cont %}
 
-{% if messages %}
-<ul class="messages">
-    {% for m in messages %}
-    <li {% if m.tags %} class="{{ m.tags }}"{% endif %}>
-        {{ m }}
-    </li>
-    {% endfor %}
-</ul>
-{% endif %}
+<!-- FILES -->
+<div class="container my-2 mx-auto">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2 class="display-6">File list for user {{ request.user }}</h2>
+        </div>
+    </div>
+</div>
+<br>
 
-<h2>File list</h2>
-{{ file_list }}
+<div class="container mx-auto">
+    <table class="table table-striped caption-top">
+        <caption>Your file list</caption>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>File name</th>
+                <th>Download link</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for file, url in user_files.items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ file }}</td>
+                <td><a href='{{ url }}'>{{ file }}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<p>base url</p>
-{{ base_url }}
-
-<p>user uuid</p>
-{{ request.user.name }}
-{{ request.user.uuid|slice:":8" }}
-
-<a href="{% url 'file-gen' %}">Generate new csv file</a>
+<div class="container text-center">
+    <div class="row align-items-center">
+        <div class="col">
+            <a class="btn btn-secondary" href="{% url 'file-gen' %}">Generate a new csv file</a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
