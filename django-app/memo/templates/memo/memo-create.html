@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 
-{% block cont%}
-<a href="{% url 'memo-list'%}">Discard</a>
-<h2>New memo - Enter details: </h2>
+{% block cont %}
 
-<form action="" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create Memo">
-</form>
-{% endblock %}
+<div class="container my-3 mx-2">
+    <div class="row mx-2 my-2">
+        <div class="col align-self-start">
+            <a class ="btn btn-secondary btn-sm"  href="{% url 'memo-list'%}">Cancel</a>
+        </div>
+        <div class="col-10">
+            <h2 class="display-6">Memo - enter details: </h2>
+        </div>
+    </div>
+
+    <div class="row mx-2 my-2">
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Create Memo">
+        </form>
+    </div>
+
+</div>
+{% endblock cont %}

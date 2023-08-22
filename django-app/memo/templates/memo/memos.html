@@ -2,33 +2,61 @@
 
 {% block cont %}
 
-<div class="container text-center">
-    <h1>Memo list page</h1>
-    <p><a href="{% url 'memo-create' %}">Create new Memo</a></p>
+<div class="container my-3 mx-0">
+    <div class="row">
+        <div class="col mx-5">
+            <h1 class="my-2 display-6 text-center">Memo list</h1>
+        </div>
+
+    <div class="row">
+        <div class="col mx-5 my-2">
+            <p class=""><a class="btn btn-outline-light btn-lg" href="{% url 'memo-create' %}">Create a new memo</a></p>
+        </div>
+
+        <div class="col-6 ms-1 my-2 align-items-end">
+            <form class="row g-3" method="GET">
+                <div class="col-8">
+                    <label for="search" class="visually-hidden form-label">Search</label>
+                    <input type="text" class="form-control mx-2" name="search-area" id="search" value="{{ search_in }}" placeholder="Search through your saved memos...">
+                </div>
+                <div class="col-4">
+                    <input type="submit" class="btn btn-secondary mx-2" value="Search">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col mx-5 text-center">
+        <table class="table align-middle table-bordered rounded rounded-2 overflow-hidden">
+            <tr>
+                <th>Memo </th>
+                <th>Title </th>
+                <th>Created </th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% for memo in memo_list %}
+            <tr>
+                <td><a class="btn px-3 btn-primary" href="{% url 'memo-detail' memo.id %}"> View </a></td>
+                <td>{{ memo.title }}</td>
+                <td>{{ memo.created }}</td>
+                <td><a class="btn px-3 btn-info" href="{% url 'memo-update' memo.id %}">Edit</a></td>
+                <td><a class="btn px-3 btn-danger" href="{% url 'memo-delete' memo.id %}">Delete</a></td>
+            </tr>
+            {% empty %}
+            <h1 class="display-6 fst-italic">You have no memos...</h1>
+            {% endfor %}
+        </table>
+        <br>
+        </div>
+
+        <div class="row mx-5">
+            <div class="col mx-0">
+                <a class="btn btn-secondary" href="{% url 'file-list' %}"><span>Show files</span></a>
+            </div>
+        </div>
+        
+    </div>
 </div>
-
-<table>
-    <tr>
-        <th>Memo #</th>
-        <th>Title </th>
-        <th>Created </th>
-        <th></th>
-        <th></th>
-    </tr>
-    {% for memo in memo_list %}
-    <tr>
-        <td><a href="{% url 'memo-detail' memo.id %}"># {{ memo.id }}</a></td>
-        <td>{{ memo.title }}</td>
-        <td>{{ memo.created }}</td>
-        <td><a href="{% url 'memo-update' memo.id %}">Edit</a></td>
-        <td><a href="{% url 'memo-delete' memo.id %}">Delete</a></td>
-    </tr>
-    {% empty %}
-    <h1>Empty list </h1>
-    {% endfor %}
-</table>
-<br>
-
-<a href="{% url 'file-list' %}"><span>Show files</span></a>
-
-{% endblock %}
+{% endblock cont %}

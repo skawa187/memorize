@@ -41,7 +41,18 @@ class MemoList(LoginRequiredMixin, ListView):
     context_object_name = 'memo_list'
 
     def get_queryset(self):
-        return Memo.objects.filter(user=self.request.user)
+        query_set = Memo.objects.filter(user=self.request.user)
+        search_in = self.request.GET.get('search-area') or None
+        if search_in is not None:
+            query_set = query_set.filter(title__icontains=search_in)
+        return query_set
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        input_data = self.request.GET.get('search-area')
+        if input_data:
+            ctx['search_in'] = input_data
+        return ctx
 
 class MemoDetail(LoginRequiredMixin, DetailView):
     model = Memo

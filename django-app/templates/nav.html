@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom border-body sticky-top"> 
-    <div class="container-fluid">
+    <div class="container-fluid mx-3">
         <a href="#" class="navbar-brand"><i class="bi bi-card-list"></i> Memorize</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav me-auto mb2 mb-lg-0">
-                <span class="navbar-text text-light-emphasis fw-semibold">Hello, {{ request.user }}</span>
+                <span class="navbar-text px-3 text-light-emphasis fw-semibold">Hello, {{ request.user|capfirst }}</span>
                 <li class="nav-item ms-3">
                     <a href="/" class="nav-link active">
                         <span class="">HOME</span>

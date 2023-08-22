@@ -12,7 +12,7 @@
 </div>
 <br>
 
-<div class="container mx-auto">
+<div class="container mx-3">
     <table class="table table-striped caption-top">
         <caption>Your file list</caption>
         <thead>
@@ -34,12 +34,13 @@
     </table>
 </div>
 
-<div class="container text-center">
+<div class="container my-3 text-center">
     <div class="row align-items-center">
         <div class="col">
+            <p class="fw-light">Save your memo list in a .csv format</p>
             <a class="btn btn-secondary" href="{% url 'file-gen' %}">Generate a new csv file</a>
         </div>
     </div>
 </div>
 
-{% endblock %}
+{% endblock cont %}
