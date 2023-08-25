@@ -1,12 +1,36 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block cont %}
-<h2>Login here</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_div }}
-    <input type="submit" value="Login">
-</form>
 
-<p>Create a new account here: <a href="{% url 'signup' %}">Sign up</a></p>
+<div class="containter">
+    <div class="row my-3">
+        <h2 class="display-6 text-lg-center">Enter your credentials</h2>
+    </div>
+    <div class="row my-2 justify-content-center">
+        <div class="col-6">
+            <form method="POST">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="form-group my-3">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field|add_class:'form-control' }}
+                    {% for e in field.errors%}
+                        <span class="help-block">{{ e }}</span>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <input type="submit" class="btn btn-outline-success" value="Login">
+            </form>
+        </div>
+    </div>
+    <div class="row mt-5 justify-content-center">
+        <div class="col-5">
+            <p class="fs-5 fw-light">Create a new account here: <a class="btn btn-outline-light" href="{% url 'signup' %}">Sign up</a></p>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

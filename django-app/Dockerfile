@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+
+FROM python:3.11.4-alpine
+
+WORKDIR /usr/src/django-app/
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install packages
+RUN pip install --upgrade pip --quiet
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt --quiet
+
+EXPOSE 8000
+
+COPY ./entrypoint.sh .
+
+# Link the secret files
+RUN ln -s /run/secrets/django_dev_key ./django_dev_key
+RUN ln -s /run/secrets/db_pass_dev ./db_pass_dev
+
+ENTRYPOINT [ "/usr/src/django-app/entrypoint.sh" ]

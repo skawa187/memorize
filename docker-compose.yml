@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  django-app:
+    build: ./django-app
+    ports:
+      - 127.0.0.1:8000:8000
+    env_file:
+      - dev.env
+    volumes:
+      - ./django-app:${DJANGO_WORKDIR}
+    secrets:
+      - django_key
+      - db_pass
+    depends_on:
+        postgres:
+          condition: service_healthy
+        redis:
+          condition: service_started
+    command: ["python", "manage.py", "runserver", "127.0.0.1:8000"]
+    restart: always
+
+  postgres:
+    image: postgres:15.4
+    env_file:
+      - dev.env
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    secrets:
+      - db_pass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7.2-alpine
+
+volumes:
+  pgdata-dev:
+    driver: local
+
+secrets:
+  django_key:
+    file: ./django-app/django_key_dev
+  db_pass:
+    file: ./django-app/db_pass_dev

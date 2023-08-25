@@ -5,6 +5,6 @@ db.sqlite3-journal
 __pycache__/
 *.py[cod]
 *$py.class
-/django_sec_dev.json
-/db_sec_dev.json
+/django_key_dev
+/db_pass_dev
 media/

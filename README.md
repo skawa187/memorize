@@ -6,19 +6,15 @@ Simple django application to save your thoughts.
 
   
 
-Create two files (secrets) in the `django-app/` directory:
+Create two files (secrets) in the `./django-app/` directory with your custom values:
  
-- django_sec_dev.json
+- django_key_dev
 ```
-{
-    "secret_key": "<secret_key_value>"
-}
+secret_key
 ```
 ***
-- db_sec_dev.json
+- db_pass_dev
 ```
-{
-    "postgres_password": "<db_password>"
-}
+db_password
 ```
 ***

@@ -13,19 +13,20 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import json, os
 
-def read_secret(file_name, field):
+def read_secret(file_name):
     with open(file_name, 'r') as f:
-        return json.load(f)[field]
+        content = f.read().strip()
+        return content
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secrets
-DJANGO_SECRET = os.path.join(BASE_DIR, 'django_sec_dev.json')
-DB_SECRET = os.path.join(BASE_DIR, 'db_sec_dev.json')
+DJANGO_SECRET = BASE_DIR / 'django_key_dev'
+DB_SECRET = BASE_DIR / 'db_pass_dev'
 
-SECRET_KEY = read_secret(DJANGO_SECRET, 'secret_key')
-DB_PASS = read_secret(DB_SECRET, 'postgres_password')
+SECRET_KEY = read_secret(DJANGO_SECRET)
+DB_PASS = read_secret(DB_SECRET)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_celery_results',
+    'django_celery_beat',
+    'widget_tweaks',
     'memo.apps.MemoConfig',
     'files.apps.FilesConfig',
 ]
@@ -84,15 +86,19 @@ WSGI_APPLICATION = 'memorize.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': DB_PASS,
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
     }
 }
 
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
+        "LOCATION": "redis://redis:6379/2",
     }
 }
 
@@ -153,9 +159,13 @@ LOGIN_URL = 'login'
 
 # Celery settings
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = TIME_ZONE
+
+# Celery beat settings
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

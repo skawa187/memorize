@@ -2,27 +2,45 @@
 
 {% block cont %}
 
-<h2> Memo {{ memo.id }} detail:</h2>
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Content</th>
-        <th>Category</th>
-        <th>Importance</th>
-        <th>Created</th>
-        <th>Last edited</th>
-    </tr>
-    <tr>
-        <td>{{ memo.id }}</td>
-        <td>{{ memo.title }}</td>
-        <td>{{ memo.body }}</td>
-        <td>{{ memo.category }}</td>
-        <td>{{ memo.importance }}</td>
-        <td>{{ memo.created|date:'r' }}</td>
-        <td>{{ memo.edited_last|date:'r' }}</td>
-    </tr>
-</table>
+<div class="container">
+    <div class="row mx-2 my-2">
+        <div class="col text-center">
+            <h1 class="display-6">Details for {{ memo.title }}:</h2>
+        </div>
+    </div>
+    <div class="row my-2 justify-content-center">
+        <div class="col-lg mx-4">
+            <table class="table table-dark table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Category</th>
+                        <th>Importance</th>
+                        <th>Created</th>
+                        <th>Last edited</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td>{{ memo.id }}</td>
+                        <td>{{ memo.title }}</td>
+                        <td>{{ memo.body }}</td>
+                        <td>{{ memo.category }}</td>
+                        <td>{{ memo.importance }}</td>
+                        <td>{{ memo.created|date:'r' }}</td>
+                        <td>{{ memo.edited_last|date:'r' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row mx-2 my-2">
+        <div class="col text-center">
+            <a class="btn btn-secondary btn-lg px-3" href="{% url 'memo-list' %}">Go back</a>
+        </div>
+    </div>
+</div>
 
-
-{% endblock %}
+{% endblock cont %}
