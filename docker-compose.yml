@@ -1,14 +1,16 @@
-version: '3'
+version: '3.8'
 
 services:
   django-app:
     build: ./django-app
+    image: memorize:1.0-dev
     ports:
-      - 127.0.0.1:8000:8000
+      - 8000:8000
     env_file:
-      - dev.env
+      - .dev.env
     volumes:
       - ./django-app:${DJANGO_WORKDIR}
+      - django-static:${DJANGO_STATIC_DIR}
     secrets:
       - django_key
       - db_pass
@@ -19,11 +21,10 @@ services:
           condition: service_started
     command: ["python", "manage.py", "runserver", "127.0.0.1:8000"]
     restart: always
-
   postgres:
     image: postgres:15.4
     env_file:
-      - dev.env
+      - .dev.env
     volumes:
       - pgdata-dev:/var/lib/postgresql/data
     secrets:
@@ -33,12 +34,23 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
   redis:
     image: redis:7.2-alpine
+  celery:
+    image: memorize:1.0-dev
+    env_file:
+      - .dev.env
+    volumes:
+      - ./django-app:${DJANGO_WORKDIR}
+    command: ["celery", "-A ${CELERY_APP_NAME}", "worker", "-l INFO"]
+    depends_on:
+      - redis
+      - django-app
 
 volumes:
   pgdata-dev:
+    driver: local
+  django-static:
     driver: local
 
 secrets:

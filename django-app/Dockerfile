@@ -16,8 +16,7 @@ EXPOSE 8000
 
 COPY ./entrypoint.sh .
 
-# Link the secret files
-RUN ln -s /run/secrets/django_dev_key ./django_dev_key
-RUN ln -s /run/secrets/db_pass_dev ./db_pass_dev
+# Link secrets to the app dir
+RUN ln -s /run/secrets/django_dev_key ./django_dev_key && ln -s /run/secrets/db_pass_dev ./db_pass_dev
 
 ENTRYPOINT [ "/usr/src/django-app/entrypoint.sh" ]
