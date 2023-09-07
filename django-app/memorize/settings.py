@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import json, os
+import os
 
 def read_secret(file_name):
     with open(file_name, 'r') as f:
@@ -93,6 +93,10 @@ DATABASES = {
         'HOST': os.environ.get('POSTGRES_HOST'),
         'PORT': os.environ.get('POSTGRES_PORT'),
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": "db.sqlite3",
+    # }
 }
 
 CACHES = {

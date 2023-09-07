@@ -19,7 +19,7 @@ services:
           condition: service_healthy
         redis:
           condition: service_started
-    command: ["python", "manage.py", "runserver", "127.0.0.1:8000"]
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     restart: always
   postgres:
     image: postgres:15.4
@@ -42,7 +42,8 @@ services:
       - .dev.env
     volumes:
       - ./django-app:${DJANGO_WORKDIR}
-    command: ["celery", "-A ${CELERY_APP_NAME}", "worker", "-l INFO"]
+    entrypoint: [ "${DJANGO_WORKDIR}/worker-entrypoint.sh" ]
+    command: ["celery", "-A", "${CELERY_APP_NAME}", "worker", "-E", "-l", "INFO"]
     depends_on:
       - redis
       - django-app
@@ -55,6 +56,6 @@ volumes:
 
 secrets:
   django_key:
-    file: ./django-app/django_key_dev
+    file: django_key_dev
   db_pass:
-    file: ./django-app/db_pass_dev
+    file: db_pass_dev

@@ -6,7 +6,7 @@ Simple django application to save your thoughts.
 
   
 
-Create two files (secrets) in the `./django-app/` directory with your custom values:
+Create two files (secrets) in the root directory with your custom values:
  
 - django_key_dev
 ```

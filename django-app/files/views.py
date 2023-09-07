@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from os import path
 
 from .tasks import generate_csv
+from .celery import app as celery_app
 
 class UserFilesView(LoginRequiredMixin, TemplateView):
     from django.core.files.storage import FileSystemStorage
@@ -26,7 +27,8 @@ def generate_csv_task(request):
     """
     Runs a task to create a new csv file for this user
     """
-    task = generate_csv.delay(request.user.id, request.user.uuid)
-    messages.add_message(request, messages.SUCCESS, 'Added a new csv file request, ID: {}'.format(task))
+    # task = generate_csv.delay(request.user.id, request.user.uuid)
+    celery_app.send_task('files.tasks.generate_csv', args=[request.user.id, request.user.uuid])
+    messages.add_message(request, messages.SUCCESS, 'Added a new csv file request, ID: {}'.format('task'))
 
     return redirect('file-list')

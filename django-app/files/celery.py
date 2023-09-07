@@ -3,8 +3,7 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'memorize.settings')
 
-app = Celery('memorize')
-
+app = Celery('files')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 

@@ -7,6 +7,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.urls import reverse_lazy
+from django.conf import settings
 from django.contrib.auth import login, get_user_model
 from .models import Memo
 from .forms import CustomRegisterForm
@@ -23,9 +24,18 @@ class SignupView(FormView):
         user.username = user.username.lower()
         user.save()
         messages.add_message(self.request, messages.SUCCESS, 'Successfully created a new user!')
+        path = self.make_dir(str(user.uuid)[:13])   # Create a directory for the new user
+        messages.add_message(self.request, messages.SUCCESS, 'Created a user directory: {}'.format(path))
         if user is not None:
             login(self.request, user)
         return super(SignupView, self).form_valid(form)
+    
+    def make_dir(self, dir_name):
+        import os
+        path = os.path.join(settings.MEDIA_ROOT, dir_name)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path
 
 class UserLoginView(LoginView):
     fields = '__all__'
@@ -39,6 +49,7 @@ class MemoList(LoginRequiredMixin, ListView):
     model = Memo
     template_name = 'memo/memos.html'
     context_object_name = 'memo_list'
+    paginate_by = 5
 
     def get_queryset(self):
         query_set = Memo.objects.filter(user=self.request.user)

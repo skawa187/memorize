@@ -29,6 +29,10 @@
                 <td>{{ file }}</td>
                 <td><a href='{{ url }}'>{{ file }}</a></td>
             </tr>
+            {% empty %}
+            <div class="col-md-6">
+                <h2 class="display-6 text-center">No files in your directory...</h2>
+            </div>
             {% endfor %}
         </tbody>
     </table>
