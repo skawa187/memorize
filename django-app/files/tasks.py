@@ -6,6 +6,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files import File
 from memo.models import Memo
 import os, csv
+from django.core.mail import mail_admins
 
 logger = get_task_logger(__name__)
 
@@ -41,3 +42,17 @@ def generate_csv(self, id, uuid):
     logger.info('File list {}'.format(file_list))
     logger.info('File name {}'.format(csvfile_name))
     return 'Task result {}, {}, uuid: {}'.format(csvfile_name, file_list, uuid)
+
+@shared_task(bind=True)
+def send_admin_email(self):
+    media_files = []
+    fs = FileSystemStorage()
+    dir_list = fs.listdir(".")[0]
+    for dir in dir_list:
+        files = fs.listdir(dir)[1]
+        for file in files:
+            file_path = os.path.join(dir, file)
+            media_files.append(file_path)
+    media_files = '; '.join(media_files)
+    logger.info(media_files)
+    mail_admins('Media files listing', media_files)

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
 
 def read_secret(file_name):
     with open(file_name, 'r') as f:
@@ -161,6 +162,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
 
+# Email
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+SERVER_EMAIL = 'app@memorize.com'
+ADMINS = [("Slawomir","ska@memorize.com")]
+
 # Celery settings
 
 CELERY_BROKER_URL = 'redis://redis:6379/0'
@@ -173,3 +180,9 @@ CELERY_TIMEZONE = TIME_ZONE
 # Celery beat settings
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "files.tasks.send_admin_email",
+        "schedule": crontab(minute="*/1"),
+    },
+}

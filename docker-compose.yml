@@ -47,6 +47,17 @@ services:
     depends_on:
       - redis
       - django-app
+  celery-beat:
+    image: memorize:1.0-dev
+    env_file:
+      - .dev.env
+    volumes:
+      - ./django-app:${DJANGO_WORKDIR}
+    entrypoint: [ "${DJANGO_WORKDIR}/worker-entrypoint.sh" ]
+    command: ["celery", "-A", "${CELERY_APP_NAME}", "beat", "-l", "INFO"]
+    depends_on:
+      - redis
+      - django-app
 
 volumes:
   pgdata-dev:
