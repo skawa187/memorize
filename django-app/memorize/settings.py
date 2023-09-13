@@ -23,14 +23,14 @@ def read_secret(file_name):
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secrets
-DJANGO_SECRET = BASE_DIR / 'django_key_dev'
-DB_SECRET = BASE_DIR / 'db_pass_dev'
+DJANGO_SECRET = BASE_DIR / 'django_key'
+DB_SECRET = BASE_DIR / 'db_pass'
 
 SECRET_KEY = read_secret(DJANGO_SECRET)
 DB_PASS = read_secret(DB_SECRET)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_HOSTS').split(' ')
 

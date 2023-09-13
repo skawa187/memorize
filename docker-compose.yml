@@ -2,31 +2,42 @@ version: '3.8'
 
 services:
   django-app:
-    build: ./django-app
-    image: memorize:1.0-dev
-    ports:
-      - 8000:8000
+    build:
+      context: ./django-app
+      dockerfile: Dockerfile.prod
+      args:
+        - APP_USER=${APP_USER}
+        - DJANGO_WORKDIR=${DJANGO_WORKDIR}
+        - STATIC_DIR=${DJANGO_STATIC_DIR}
+    image: memorize:1.0
+    expose:
+      - 8000
     env_file:
-      - .dev.env
+      - .prod.env
     volumes:
-      - ./django-app:${DJANGO_WORKDIR}
       - django-static:${DJANGO_STATIC_DIR}
     secrets:
-      - django_key
-      - db_pass
+      - source: django_key
+        uid: "100"
+        gid: "101"
+        mode: 0440
+      - source: db_pass
+        uid: "100"
+        gid: "101"
+        mode: 0440
     depends_on:
         postgres:
           condition: service_healthy
         redis:
           condition: service_started
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["gunicorn", "memorize.wsgi:application", "--bind", "0.0.0.0:8000"]
     restart: always
   postgres:
     image: postgres:15.4
     env_file:
-      - .dev.env
+      - .prod.env
     volumes:
-      - pgdata-dev:/var/lib/postgresql/data
+      - pgdata-prod:/var/lib/postgresql/data
     secrets:
       - db_pass
     healthcheck:
@@ -37,22 +48,28 @@ services:
   redis:
     image: redis:7.2-alpine
   celery:
-    image: memorize:1.0-dev
+    image: memorize:1.0
     env_file:
-      - .dev.env
-    volumes:
-      - ./django-app:${DJANGO_WORKDIR}
+      - .prod.env
+    secrets:
+      - source: django_key
+        uid: "100"
+        gid: "101"
+        mode: 0440
     entrypoint: [ "${DJANGO_WORKDIR}/worker-entrypoint.sh" ]
     command: ["celery", "-A", "${CELERY_APP_NAME}", "worker", "-E", "-l", "INFO"]
     depends_on:
       - redis
       - django-app
   celery-beat:
-    image: memorize:1.0-dev
+    image: memorize:1.0
     env_file:
-      - .dev.env
-    volumes:
-      - ./django-app:${DJANGO_WORKDIR}
+      - .prod.env
+    secrets:
+      - source: django_key
+        uid: "100"
+        gid: "101"
+        mode: 0440
     entrypoint: [ "${DJANGO_WORKDIR}/worker-entrypoint.sh" ]
     command: ["celery", "-A", "${CELERY_APP_NAME}", "beat", "-l", "INFO"]
     depends_on:
@@ -60,13 +77,13 @@ services:
       - django-app
 
 volumes:
-  pgdata-dev:
+  pgdata-prod:
     driver: local
   django-static:
     driver: local
 
 secrets:
   django_key:
-    file: django_key_dev
+    file: django_key
   db_pass:
-    file: db_pass_dev
+    file: db_pass
