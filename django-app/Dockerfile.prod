@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.11.4-alpine
+FROM python:3.11.4-alpine as base
 LABEL version="1.0"
 LABEL mantainer="skawa@dev.memorize.com" 
 
@@ -10,17 +10,32 @@ ARG APP_USER
 ARG DJANGO_WORKDIR
 ARG STATIC_DIR
 
-# Install packages
+### BUILD STAGE ###
+
+FROM base as builder
+WORKDIR /build
+# Build pip wheels
 RUN pip install --upgrade pip --quiet
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt --quiet
+RUN pip wheel --no-cache-dir --wheel-dir ./pip-wheels -r requirements.txt
 
+### FINAL STAGE ###
+
+FROM base as final
 # Set up the user
 WORKDIR ${DJANGO_WORKDIR}
 RUN addgroup -S -g 101 ${APP_USER} && adduser -S -u 100 -G ${APP_USER} ${APP_USER}
 
 # Prepare static directory
 RUN install -d -o ${APP_USER} -g ${APP_USER} ${STATIC_DIR}
+
+# Install Rsync
+RUN apk --no-cache add rsync
+
+# Install pip packages
+COPY --from=builder /build/pip-wheels /pip-wheels
+COPY --from=builder /build/requirements.txt .
+RUN pip install --upgrade pip --quiet && pip install --no-cache /pip-wheels/*
 
 # Copy app files
 COPY --chown=${APP_USER}:${APP_USER} . ${DJANGO_WORKDIR}

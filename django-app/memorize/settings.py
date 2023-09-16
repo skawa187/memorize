@@ -183,6 +183,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "files.tasks.send_admin_email",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(hour=0, minute=0),
     },
 }

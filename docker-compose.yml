@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  nginx:
+    build:
+      context: ./nginx
+    networks:
+      - net-1
+    ports:
+      - "8080:80"
+    volumes:
+      - django-static:${DJANGO_STATIC_DIR}
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    depends_on:
+      django-app:
+        condition: service_started
   django-app:
     build:
       context: ./django-app
@@ -10,10 +23,12 @@ services:
         - DJANGO_WORKDIR=${DJANGO_WORKDIR}
         - STATIC_DIR=${DJANGO_STATIC_DIR}
     image: memorize:1.0
-    expose:
-      - 8000
     env_file:
       - .prod.env
+    networks:
+      - net-1
+    expose:
+      - 8000
     volumes:
       - django-static:${DJANGO_STATIC_DIR}
     secrets:
@@ -30,12 +45,14 @@ services:
           condition: service_healthy
         redis:
           condition: service_started
-    command: ["gunicorn", "memorize.wsgi:application", "--bind", "0.0.0.0:8000"]
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--forwarded-allow-ips=*", "memorize.wsgi:application",]
     restart: always
   postgres:
     image: postgres:15.4
     env_file:
       - .prod.env
+    networks:
+      - net-1
     volumes:
       - pgdata-prod:/var/lib/postgresql/data
     secrets:
@@ -47,12 +64,23 @@ services:
       retries: 10
   redis:
     image: redis:7.2-alpine
+    networks:
+      - net-1
+    deploy:
+      mode: replicated
+      replicas: 1
   celery:
     image: memorize:1.0
     env_file:
       - .prod.env
+    networks:
+      - net-1
     secrets:
       - source: django_key
+        uid: "100"
+        gid: "101"
+        mode: 0440
+      - source: db_pass
         uid: "100"
         gid: "101"
         mode: 0440
@@ -60,21 +88,13 @@ services:
     command: ["celery", "-A", "${CELERY_APP_NAME}", "worker", "-E", "-l", "INFO"]
     depends_on:
       - redis
-      - django-app
   celery-beat:
-    image: memorize:1.0
-    env_file:
-      - .prod.env
-    secrets:
-      - source: django_key
-        uid: "100"
-        gid: "101"
-        mode: 0440
+    extends:
+      service: celery
     entrypoint: [ "${DJANGO_WORKDIR}/worker-entrypoint.sh" ]
     command: ["celery", "-A", "${CELERY_APP_NAME}", "beat", "-l", "INFO"]
     depends_on:
       - redis
-      - django-app
 
 volumes:
   pgdata-prod:
@@ -87,3 +107,6 @@ secrets:
     file: django_key
   db_pass:
     file: db_pass
+
+networks:
+  net-1:

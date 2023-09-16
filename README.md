@@ -1,4 +1,4 @@
-# Memorize (dev)
+# Memorize
 
 Simple django application to save your thoughts.
 
@@ -8,13 +8,19 @@ Simple django application to save your thoughts.
 
 Create two files (secrets) in the root directory with your custom values:
  
-- django_key_dev
+- django_key
 ```
 secret_key
 ```
 ***
-- db_pass_dev
+- db_pass
 ```
 db_password
 ```
+***
+
+To deploy the application run a docker compose command like this:
+
+`docker compose --env-file .prod.env up -d`
+
 ***
