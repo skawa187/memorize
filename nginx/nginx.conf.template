@@ -1,0 +1,38 @@
+upstream django {
+    server ${NGINX_DJANGO_HOST};
+}
+
+server {
+    listen 443 ssl;
+    include snippets/self-sign.conf;
+    include snippets/ssl-params.conf;
+
+    client_max_body_size 100M;
+    server_name default_server;
+
+    keepalive_timeout 5;
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_pass http://django;
+    }
+
+    location /static/ {
+        alias ${DJANGO_STATIC_DIR};
+    }
+
+    location /media/ {
+        sendfile on;
+        alias ${NGINX_MEDIA_LOCATION};
+    }
+}
+
+server {
+    listen 80;
+    server_name insecure;
+
+    return 302 https://$host$request_uri;
+}

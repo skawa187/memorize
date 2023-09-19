@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED 1
 ARG APP_USER
 ARG DJANGO_WORKDIR
 ARG STATIC_DIR
+ARG MEDIA_DIR
 
 ### BUILD STAGE ###
 
@@ -27,7 +28,7 @@ WORKDIR ${DJANGO_WORKDIR}
 RUN addgroup -S -g 101 ${APP_USER} && adduser -S -u 100 -G ${APP_USER} ${APP_USER}
 
 # Prepare static directory
-RUN install -d -o ${APP_USER} -g ${APP_USER} ${STATIC_DIR}
+RUN install -d -o ${APP_USER} -g ${APP_USER} ${STATIC_DIR} ${MEDIA_DIR}
 
 # Install Rsync
 RUN apk --no-cache add rsync

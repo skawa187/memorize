@@ -4,13 +4,26 @@ services:
   nginx:
     build:
       context: ./nginx
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    env_file:
+      - .prod.env
     networks:
-      - net-1
+      - front
     ports:
       - "8080:80"
+      - "443:443"
     volumes:
       - django-static:${DJANGO_STATIC_DIR}
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - django-media:/www/data/memorize
+    secrets:
+      - source: server-cert
+        target: /etc/ssl/certs/memorize.com.crt
+      - source: server-key
+        target: /etc/ssl/private/memorize.com.key
     depends_on:
       django-app:
         condition: service_started
@@ -22,15 +35,23 @@ services:
         - APP_USER=${APP_USER}
         - DJANGO_WORKDIR=${DJANGO_WORKDIR}
         - STATIC_DIR=${DJANGO_STATIC_DIR}
+        - MEDIA_DIR=${DJANGO_MEDIA_DIR}
     image: memorize:1.0
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.50'
+          memory: 256M
     env_file:
       - .prod.env
     networks:
-      - net-1
+      - front
+      - back
     expose:
       - 8000
     volumes:
       - django-static:${DJANGO_STATIC_DIR}
+      - django-media:${DJANGO_MEDIA_DIR}
     secrets:
       - source: django_key
         uid: "100"
@@ -40,23 +61,30 @@ services:
         uid: "100"
         gid: "101"
         mode: 0440
+    command: ["gunicorn", "memorize.wsgi:application", "--bind", "0.0.0.0:8000", "--forwarded-allow-ips='nginx'",
+               "--workers=4"]
     depends_on:
-        postgres:
+        db:
           condition: service_healthy
         redis:
           condition: service_started
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--forwarded-allow-ips=*", "memorize.wsgi:application",]
     restart: always
-  postgres:
+  db:
     image: postgres:15.4
+    deploy:
+      resources:
+        reservations:
+          memory: 128M
     env_file:
       - .prod.env
     networks:
-      - net-1
+      - back
     volumes:
       - pgdata-prod:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     secrets:
       - db_pass
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
       interval: 5s
@@ -64,17 +92,28 @@ services:
       retries: 10
   redis:
     image: redis:7.2-alpine
-    networks:
-      - net-1
     deploy:
+      resources:
+        reservations:
+          cpus: '0.1'
+          memory: 16M
       mode: replicated
       replicas: 1
+    networks:
+      - front
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    command: ["redis-server", "/etc/redis/redis.conf"]
   celery:
     image: memorize:1.0
     env_file:
       - .prod.env
     networks:
-      - net-1
+      - front
+      - back
+    volumes:
+      - django-media:${DJANGO_MEDIA_DIR}:rw
     secrets:
       - source: django_key
         uid: "100"
@@ -99,7 +138,11 @@ services:
 volumes:
   pgdata-prod:
     driver: local
+  redis-data:
+    driver: local
   django-static:
+    driver: local
+  django-media:
     driver: local
 
 secrets:
@@ -107,6 +150,11 @@ secrets:
     file: django_key
   db_pass:
     file: db_pass
+  server-cert:
+    file: ./nginx/memorize.com.crt
+  server-key:
+    file: ./nginx/memorize.com.key
 
 networks:
-  net-1:
+  front:
+  back:

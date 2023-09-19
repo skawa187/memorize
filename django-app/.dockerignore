@@ -1,3 +1,5 @@
 Dockerfile*
 *.md
 /media
+*.sqlite3
+/venv
