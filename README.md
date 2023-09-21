@@ -28,8 +28,33 @@ db_password
 
 ***
 
-To deploy run a docker compose command like this:
+4. In the `./redis` directory place a file named `users.acl` describing access rules (replace 'user_password')
+`user celery +@all allkeys allchannels on >user_password`
+`user django +@all allkeys allchannels on nopass`
 
-`docker compose --env-file .prod.env up -d`
+***
+
+## 	Stack components
+
+| Service | Purpose | Ports |
+|--|--|--|
+|**nginx**  | Acts as a gateway | 80tcp, 443tcp (exposed to the host at 8080, 443) |
+| **django-app** | Generate web content | 8000tcp (internal) |
+| **db** | Store persistent  | 5432tcp (internal) |
+| **redis** | Db reads caching, message broker for celery, storing celery results | 6379tcp (internal) |
+| **celery** | Execute offloaded tasks |  |
+| **celery-beat** | Execute scheduled tasks |  |
+***
+
+## Configuration
+1. `nginx/nginx.conf.template`
+2. `postgres/postgresql.conf`
+3. `redis/redis.conf`
+4. Env files in the `env` directory for every service and one `.prod.env` with all services 
+***
+
+## Deployment
+To deploy run a docker compose command:
+`docker compose --env-file env/.prod.env up -d`
 
 ***

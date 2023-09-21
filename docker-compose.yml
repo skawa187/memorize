@@ -4,13 +4,15 @@ services:
   nginx:
     build:
       context: ./nginx
+    image: memorize-nginx:1.0
     deploy:
       resources:
         reservations:
           cpus: '0.25'
           memory: 64M
     env_file:
-      - .prod.env
+      - env/.nginx.env
+      - env/.django.env
     networks:
       - front
     ports:
@@ -43,7 +45,9 @@ services:
           cpus: '0.50'
           memory: 256M
     env_file:
-      - .prod.env
+      - env/.django.env
+      - env/.db.env
+      - env/.celery.env
     networks:
       - front
       - back
@@ -76,7 +80,7 @@ services:
         reservations:
           memory: 128M
     env_file:
-      - .prod.env
+      - env/.db.env
     networks:
       - back
     volumes:
@@ -104,11 +108,16 @@ services:
     volumes:
       - redis-data:/data
       - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    secrets:
+      - source: redis-users
+        target: /etc/redis/users.acl
     command: ["redis-server", "/etc/redis/redis.conf"]
   celery:
     image: memorize:1.0
     env_file:
-      - .prod.env
+      - env/.django.env
+      - env/.db.env
+      - env/.celery.env
     networks:
       - front
       - back
@@ -150,6 +159,8 @@ secrets:
     file: django_key
   db_pass:
     file: db_pass
+  redis-users:
+    file: redis/users.acl
   server-cert:
     file: ./nginx/memorize.com.crt
   server-key:

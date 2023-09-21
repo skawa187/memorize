@@ -103,7 +103,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis:6379/2",
+        "LOCATION": "redis://django@redis:6379/2",
     }
 }
 
@@ -149,7 +149,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-STATIC_ROOT = '/usr/share/nginx/memorize/static/'
+STATIC_ROOT = os.environ.get('DJANGO_STATIC_DIR')
 
 MEDIA_URL = 'media/'
 
@@ -170,8 +170,8 @@ ADMINS = [("Slawomir","ska@memorize.com")]
 
 # Celery settings
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = os.environ.get('BROKER_URL')
+CELERY_RESULT_BACKEND = os.environ.get('RESULT_BACKEND')
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
